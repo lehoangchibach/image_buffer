@@ -6,8 +6,8 @@ def add_black_backgrounds(images):
      for image in images:
           add_black_background(image)
 
-def add_black_background(image_path, output_path="data/jpg/outputs/"):
-    image_name = image_path.split("\\")[-1].split(".")[0]
+def add_black_background(image_path, output_path="./data/jpg/outputs/"):
+    image_name = image_path.split("/")[-1].split(".")[0]
     # Open the original image
     image = Image.open(image_path)
     image = ImageOps.exif_transpose(image)
@@ -55,7 +55,7 @@ def split_list(lst, n):
 
 
 
-directory = "data/jpg/inputs"
+directory = "./data/jpg/inputs"
 all_files = list_files_in_directory(directory)
 num_procs = 8
 sub_lists = split_list(all_files, num_procs)
