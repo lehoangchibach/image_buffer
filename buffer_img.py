@@ -1,22 +1,28 @@
-from PIL import Image, ImageOps
 import os
+import shutil
 from multiprocessing.pool import ThreadPool
 
-def add_black_backgrounds(images):
-     for image in images:
-          add_black_background(image)
+from PIL import Image, ImageOps
 
-def add_black_background(image_path, output_path="./data/jpg/outputs/"):
+OUTPUT_PATH = "./data/jpg/outputs/"
+
+
+def add_black_backgrounds(images):
+    for image in images:
+        add_black_background(image)
+
+
+def add_black_background(image_path, output_path=OUTPUT_PATH):
     image_name = image_path.split("/")[-1].split(".")[0]
     # Open the original image
     image = Image.open(image_path)
     image = ImageOps.exif_transpose(image)
-    
+
     # Calculate the desired size for a 4:5 aspect ratio
     width, height = image.size
     original_aspect_ratio = width / height
     target_aspect_ratio = 4 / 5
-    
+
     if original_aspect_ratio > target_aspect_ratio:
         # The image is wider, so we'll match the width and add height
         new_width = width + round(width * 0.1 * 2)
@@ -24,7 +30,7 @@ def add_black_background(image_path, output_path="./data/jpg/outputs/"):
     else:
         # The image is taller, so we'll match the height and add width
         new_height = height + round(height * 0.1 * 2)
-        new_width = int(new_height * target_aspect_ratio)   
+        new_width = int(new_height * target_aspect_ratio)
 
     # Create a new image with the target 4:5 aspect ratio
     new_image = Image.new(image.mode, (new_width, new_height), color=(0, 0, 0))
@@ -35,7 +41,6 @@ def add_black_background(image_path, output_path="./data/jpg/outputs/"):
 
     # Save the output image
     new_image.save(output_path + f"buffed_{image_name}.jpg", quality=100)
-
 
 
 def list_files_in_directory(directory_path):
@@ -51,8 +56,7 @@ def list_files_in_directory(directory_path):
 
 def split_list(lst, n):
     k, m = divmod(len(lst), n)
-    return [lst[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
-
+    return [lst[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n)]
 
 
 directory = "./data/jpg/inputs"
@@ -60,7 +64,7 @@ all_files = list_files_in_directory(directory)
 num_procs = 8
 sub_lists = split_list(all_files, num_procs)
 
+shutil.rmtree(OUTPUT_PATH)
 with ThreadPool(processes=num_procs) as pool:
-        # Map the square function to the numbers list
-        results = pool.map(add_black_backgrounds, sub_lists)
-
+    # Map the square function to the numbers list
+    results = pool.map(add_black_backgrounds, sub_lists)
