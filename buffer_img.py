@@ -40,7 +40,7 @@ def add_black_background(image_path, output_path=OUTPUT_PATH):
     new_image.paste(image, paste_position)
 
     # Save the output image
-    new_image.save(output_path + f"buffed_{image_name}.jpg", quality=100)
+    new_image.save(os.path.join(output_path, f"buffed_{image_name}.jpg"), quality=100)
 
 
 def list_files_in_directory(directory_path):
@@ -61,10 +61,11 @@ def split_list(lst, n):
 
 directory = "./data/jpg/inputs"
 all_files = list_files_in_directory(directory)
-num_procs = 8
+num_procs = min(8, len(all_files))
 sub_lists = split_list(all_files, num_procs)
 
 shutil.rmtree(OUTPUT_PATH)
+os.makedirs(OUTPUT_PATH, exist_ok=True)
 with ThreadPool(processes=num_procs) as pool:
     # Map the square function to the numbers list
     results = pool.map(add_black_backgrounds, sub_lists)
